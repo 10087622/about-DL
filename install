@@ -1,0 +1,109 @@
+首先，从 https://github.com/bazelbuild/bazel/releases 下载对应的bazel 文件，
+我下载的版本是：0.5.2
+三个文件：
+200 MBbazel-0.5.2-installer-linux-x86_64.sh
+104 Bytesbazel-0.5.2-installer-linux-x86_64.sh.sha256
+543 Bytesbazel-0.5.2-installer-linux-x86_64.sh.sig
+
+安装：
+[root@centos7 tensorflow_test]# chmod +x bazel-0.5.2-installer-linux-x86_64.sh
+[root@centos7 tensorflow_test]# ./bazel-0.5.2-installer-linux-x86_64.sh
+
+看到如下打印，安装相当快。
+Bazel is now installed!
+
+Make sure you have "/usr/local/bin" in your path. You can also activate bash
+completion by adding the following line to your ~/.bashrc:
+  source /usr/local/lib/bazel/bin/bazel-complete.bash
+
+See http://bazel.build/docs/getting-started.html to start a new project!
+
+
+下一步，参考help文件：
+https://docs.bazel.build/versions/master/tutorial/cpp.html
+
+下载examples文件：
+[root@centos7 examples-master]# ls
+AUTHORS  CONTRIBUTING.md  CONTRIBUTORS  cpp-tutorial  java-maven  java-tutorial  LICENSE.txt  README.md  rules  tutorial
+
+进入路径：
+[root@centos7 stage1]# pwd
+/home/caq/code/bazelbuild/examples-master/cpp-tutorial/stage1
+
+编译，看起来也不快，与期望值不相符合啊：
+[root@centos7 stage1]# bazel build //main:hello-world
+WARNING: ignoring http_proxy in environment.
+..................................................................................................................
+INFO: Found 1 target...
+Target //main:hello-world up-to-date:
+  bazel-bin/main/hello-world
+INFO: Elapsed time: 14.059s, Critical Path: 0.84s
+
+执行：
+[root@centos7 stage1]# ./bazel-bin/main/hello-world
+Hello world
+
+分析依赖图：
+bazel query --nohost_deps --noimplicit_deps 'deps(//main:hello-world)' \
+  --output graph
+  
+  WARNING: ignoring http_proxy in environment.
+digraph mygraph {
+  node [shape=box];
+"//main:hello-world"
+"//main:hello-world" -> "//main:hello-world.cc"                 这个说明只依赖于.cc文件
+"//main:hello-world.cc"
+}
+
+好，进一步的，增加依赖，进入starge2
+[root@centos7 main]# pwd
+/home/caq/code/bazelbuild/examples-master/cpp-tutorial/stage2/main
+
+[root@centos7 main]# bazel build //main:hello-world
+WARNING: ignoring http_proxy in environment.
+..................................................................................................................
+INFO: Found 1 target...
+Target //main:hello-world up-to-date:
+  bazel-bin/main/hello-world
+INFO: Elapsed time: 13.470s, Critical Path: 0.35s
+
+执行bin文件测试：
+[root@centos7 stage2]# ./bazel-bin/main/hello-world 
+Thu Jul 27 19:49:41 2017
+
+发现源文件少了一行代码，补上之后结果：
+[root@centos7 stage2]# bazel-bin/main/hello-world
+Hello world
+Thu Jul 27 19:56:21 2017
+[root@centos7 stage2]# bazel-bin/main/hello-world hahaha
+Hello hahaha
+Thu Jul 27 19:56:25 2017
+[root@centos7 stage2]# bazel-bin/main/hello-world caq
+Hello caq
+Thu Jul 27 19:56:29 2017
+
+
+那么，多个依赖怎么写？
+
+[root@centos7 stage3]# pwd
+/home/caq/code/bazelbuild/examples-master/cpp-tutorial/stage3
+[root@centos7 stage3]# bazel build //main:hello-world
+WARNING: ignoring http_proxy in environment.
+..................................................................................................................
+INFO: Found 1 target...
+Target //main:hello-world up-to-date:
+  bazel-bin/main/hello-world
+INFO: Elapsed time: 13.557s, Critical Path: 0.35s
+
+
+[root@centos7 stage3]# bazel-bin/main/hello-world
+Hello world
+Thu Jul 27 19:59:20 2017
+[root@centos7 stage3]# bazel-bin/main/hello-world caq
+Hello caq
+Thu Jul 27 19:59:23 2017
+
+
+如果有疑问，可以直接从https://docs.bazel.build/versions/master/tutorial/cpp.html找到答案。  
+完毕。
+
