@@ -1,0 +1,127 @@
+环境描述：
+[root@centos7 dsniff-master]# uname -a
+Linux centos7 3.10.0+ #2 SMP Tue Jul 11 20:48:16 CST 2017 x86_64 x86_64 x86_64 GNU/Linux
+由于这个内核我开启了slub，然后合入了bbr发的补丁包，所以和命名内核名字为3.10.0+
+
+
+下载安装包：
+下载 TensorFlow 的包。
+由于Anaconda管理python环境的包比较方便，先安装一个Anaconda。
+下载：Anaconda2-4.4.0-Linux-x86_64.sh
+直接执行。
+
+执行之后查看python版本：
+Python 2.7.13 |Anaconda 4.4.0 (64-bit)| (default, Dec 20 2016, 23:09:15) 
+[GCC 4.4.7 20120313 (Red Hat 4.4.7-1)] on linux2
+
+既然是python2.7的版本，而且我的环境没有gpu，那么选择tensorflow版本的时候一定要注意，使用cp27字样的版本，否则会不匹配。
+
+下载https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+
+之所以下载tensorflow-1.0.1，纯粹是随便下载的，只要匹配cp27就行，当然也有更高版本下载。
+
+安装：
+[root@centos7 code]#pip install tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Processing ./tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Requirement already satisfied: six>=1.10.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: numpy>=1.11.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Collecting mock>=2.0.0 (from tensorflow==1.0.1)
+
+发现anaconda里有一些包，缺少的哪个包就下载哪个，无非就是滚雪球啊。
+到 https://pypi.python.org/ 上找mock包，注意，如果six和numpy没有，也可以这样查找。
+由于对版本也有要求，下载mock-2.0.0-py2.py3-none-any.whl
+
+[root@centos7 code]# pip install mock-2.0.0-py2.py3-none-any.whl 
+Processing ./mock-2.0.0-py2.py3-none-any.whl
+Requirement already satisfied: funcsigs>=1; python_version < "3.3" in /root/anaconda2/lib/python2.7/site-packages (from mock==2.0.0)
+Requirement already satisfied: six>=1.9 in /root/anaconda2/lib/python2.7/site-packages (from mock==2.0.0)
+Collecting pbr>=0.11 (from mock==2.0.0)
+
+发现mock又尼玛依赖于pbr，继续到 https://pypi.python.org/ 上找pbr包，
+
+[root@centos7 code]#pip install pbr-3.1.1-py2.py3-none-any.whl 
+Processing ./pbr-3.1.1-py2.py3-none-any.whl
+Installing collected packages: pbr
+Successfully installed pbr-3.1.1
+
+pbr安装成功。
+
+
+ [root@centos7 code]#pip install mock-2.0.0-py2.py3-none-any.whl 
+Processing ./mock-2.0.0-py2.py3-none-any.whl
+Requirement already satisfied: funcsigs>=1; python_version < "3.3" in /root/anaconda2/lib/python2.7/site-packages (from mock==2.0.0)
+Requirement already satisfied: six>=1.9 in /root/anaconda2/lib/python2.7/site-packages (from mock==2.0.0)
+Requirement already satisfied: pbr>=0.11 in /root/anaconda2/lib/python2.7/site-packages (from mock==2.0.0)
+Installing collected packages: mock
+Successfully installed mock-2.0.0
+
+mock安装成功。
+
+继续安装tensorflow：
+[root@centos7 code]# pip install tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Processing ./tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Requirement already satisfied: numpy>=1.11.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: six>=1.10.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: mock>=2.0.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: wheel in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Collecting protobuf>=3.1.0 (from tensorflow==1.0.1)
+
+又缺少 protobuf 包，好事多磨，继续下载protobuf（protocolbuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。
+google 提供了多种语言的实现：java、c#、c++、go 和 python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml 进行数据交换快许多。可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。）
+
+ [root@centos7 code]#pip install protobuf-3.3.0-cp27-cp27mu-manylinux1_x86_64.whl
+ 
+ Processing ./protobuf-3.3.0-cp27-cp27mu-manylinux1_x86_64.whl
+Requirement already satisfied: six>=1.9 in /root/anaconda2/lib/python2.7/site-packages (from protobuf==3.3.0)
+Requirement already satisfied: setuptools in /root/anaconda2/lib/python2.7/site-packages/setuptools-27.2.0-py2.7.egg (from protobuf==3.3.0)
+Installing collected packages: protobuf
+Successfully installed protobuf-3.3.0
+
+
+[root@centos7 code]# pip install tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Processing ./tensorflow-1.0.1-cp27-none-linux_x86_64.whl
+Requirement already satisfied: numpy>=1.11.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: mock>=2.0.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: wheel in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: six>=1.10.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: protobuf>=3.1.0 in /root/anaconda2/lib/python2.7/site-packages (from tensorflow==1.0.1)
+Requirement already satisfied: funcsigs>=1; python_version < "3.3" in /root/anaconda2/lib/python2.7/site-packages (from mock>=2.0.0->tensorflow==1.0.1)
+Requirement already satisfied: pbr>=0.11 in /root/anaconda2/lib/python2.7/site-packages (from mock>=2.0.0->tensorflow==1.0.1)
+Requirement already satisfied: setuptools in /root/anaconda2/lib/python2.7/site-packages/setuptools-27.2.0-py2.7.egg (from protobuf>=3.1.0->tensorflow==1.0.1)
+Installing collected packages: tensorflow
+Successfully installed tensorflow-1.0.1
+大功告成。
+
+下面简单测试一下：
+[root@centos7 T_TensorFlow]# vi test_Tensor_Flow.py 
+
+import tensorflow as tf
+hello = tf.constant('Hello caq, you install TensorFlow succeed!')
+sess = tf.Session()
+print(sess.run(hello))
+a = tf.constant(10)
+b = tf.constant(10)
+print(sess.run(a + b))
+
+测试如下：
+[root@centos7 T_TensorFlow]# python test_Tensor_Flow.py 
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE3 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+Hello caq, you install TensorFlow succeed!
+20
+
+The TensorFlow library wasn't compiled to use SSE4.2，这个是指我当前的硬件可以有更好的性能，如果编译 use SSE4.2会更好。
+
+所以对os模块执行一下版本：
+在import tensorflow之前，限制一下他的日志级别：
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+再次执行：
+[root@centos7 T_TensorFlow]#  python test_Tensor_Flow.py 
+ Hello caq, you install TensorFlow succeed!
+20
+
+下一步，我会进行利用tensorflow 来做一个简单分类。
+
